@@ -10,7 +10,7 @@
  import { OverlayElement } from '@vaadin/vaadin-overlay/src/vaadin-overlay';
  
  registerStyles(
-   'vcf-enhanced-autocomplete-overlay',
+   'vcf-autosuggest-overlay',
    css`
      :host {
        align-items: flex-start;
@@ -31,10 +31,10 @@
  );
  
  /**
-  * `<vcf-enhanced-autocomplete-overlay>` The enhanced-autocomplete overlay element.
+  * `<vcf-autosuggest-overlay>` The autosuggest overlay element.
   *
   * ```html
-  * <vcf-enhanced-autocomplete-overlay></vcf-enhanced-autocomplete-overlay>
+  * <vcf-autosuggest-overlay></vcf-autosuggest-overlay>
   * ```
   *
   * ### Styling
@@ -48,10 +48,10 @@
   * @extends OverlayElement
   * @demo demo/index.html
   */
- class EnhancedAutocompleteOverlayElement extends OverlayElement {
+ class AutosuggestOverlayElement extends OverlayElement {
      static get is() {
-         return 'vcf-enhanced-autocomplete-overlay';
+         return 'vcf-autosuggest-overlay';
      }
  }
- customElements.define(EnhancedAutocompleteOverlayElement.is, EnhancedAutocompleteOverlayElement);
+ customElements.define(AutosuggestOverlayElement.is, AutosuggestOverlayElement);
  
