@@ -1,6 +1,51 @@
 {
-  "license": "UNLICENSED",
-  "name": "vcf-autosuggest",
+  "license": "https://raw.githubusercontent.com/vaadin/vaadin-incubator-element/master/LICENSE",
+  "name": "@vaadin-component-factory/vcf-autosuggest",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vaadin-component-factory/vcf-autosuggest.git"
+  },
+  "author": "Vaadin Ltd",
+  "main": "theme/lumo/vcf-autosuggest.js",
+  "description": "Web Component with a text input that provides a panel of suggested options.",
+  "keywords": [
+    "Vaadin",
+    "vaadin-incubator-element",
+    "vaadin-component-factory",
+    "vcf-autosuggest",
+    "web-components",
+    "web-component",
+    "polymer"
+  ],
+  "scripts": {
+    "test": "wct",
+    "lint": "eslint src/*.js",
+    "prestart": "polymer analyze src/*.js > analysis.json",
+    "start": "polymer serve -o",
+    "build:prod": "run-s build:api build:demo",
+    "build:api": "npm run prestart && polymer build",
+    "build:demo": "webpack",
+    "publish": "node util/publish.js"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/*.js": [
+      "eslint --fix",
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "bugs": {
+    "url": "https://github.com/vaadin-component-factory/vcf-autosuggest/issues"
+  },
+  "homepage": "https://github.com/vaadin-component-factory/vcf-autosuggest#readme",
+  "directories": {
+    "test": "test"
+  },
   "dependencies": {
     "@polymer/iron-icon": "3.0.1",
     "@polymer/iron-list": "3.1.0",
