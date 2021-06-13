@@ -17,6 +17,9 @@
     "web-component",
     "polymer"
   ],
+  "files": [
+    "styles/*.css"
+  ],
   "scripts": {
     "test": "wct",
     "lint": "eslint src/*.js",
