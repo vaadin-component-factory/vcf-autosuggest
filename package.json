@@ -18,7 +18,9 @@
     "polymer"
   ],
   "files": [
-    "styles/*.css"
+    "styles/*.css",
+    "src/**/*",
+    "theme/**/*"
   ],
   "scripts": {
     "test": "wct",
