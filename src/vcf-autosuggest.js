@@ -345,7 +345,7 @@ import './vcf-autosuggest-overlay';
 
     _onInput(event) {
         this.inputValue = event.target.value.trim();
-        if(event.target.value.trim().length>0 || !this.customizeOptionsForWhenValueIsNull) this._refreshOptionsToDisplay(this.options, this.inputValue)
+        if(event.target.value.trim().length>0 || this.customizeOptionsForWhenValueIsNull) this._refreshOptionsToDisplay(this.options, this.inputValue)
         if(this.lazy && event.target.value.trim().length>0) this.loading = true;
         if(event.target.value.trim().length > 0) this.opened = true;
         this._showNoResultsItem = this._optionsToDisplay.length < (this.defaultValue==null ? 0 : 1)  && !this.loading;
@@ -431,7 +431,7 @@ import './vcf-autosuggest-overlay';
         }
     }
 
-    _applyValue(value) {
+    _applyValue(value, keepDropdownOpened=false) {
         if(value == null && this.defaultValue != null) value = this.defaultValue;
         this.selectedValue = (value == this.defaultValue ? null : value);
         this.dispatchEvent(
@@ -442,15 +442,23 @@ import './vcf-autosuggest-overlay';
                 }
             })
         );
-        this._changeTextFieldValue(value);
-        this.opened = false;
-        this.$.textField.blur();
+        if(!keepDropdownOpened) {
+            this._changeTextFieldValue(value);
+            this.opened = false;
+            this.$.textField.blur();
+        } else {
+            this._changeTextFieldValue(value);
+            this._inputValueChanged(value);
+        }
     }
 
-    clear() {
-        this._applyValue(this.defaultValue != null ? this.defaultValue : '');
+    clear(keepDropdownOpened=false) {
+        if(!keepDropdownOpened) this._applyValue(this.defaultValue != null ? this.defaultValue : '', true);
         this.$.textField.focus();
-        this.opened = false;
+        if(!keepDropdownOpened) {
+            this.opened = false;
+            this.$.textField.blur();
+        }
     }
 
     _changeTextFieldValue(newValue) {
@@ -476,6 +484,8 @@ import './vcf-autosuggest-overlay';
                 cancelable: true
             })
         );
+
+        this._inputValueChanged(newValue);
     }
     
     _optionsToDisplayChanged(otd, opened) {
