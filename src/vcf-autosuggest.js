@@ -152,7 +152,7 @@ import './vcf-autosuggest-overlay';
             customizeOptionsForWhenValueIsNull: { type: Boolean, value: false },
             optionsForWhenValueIsNull: { type: Array, value: () => [] },
             disableSearchHighlighting: { type: Boolean, value: false },
-            defaultValue: { type: String, value: "" },
+            defaultValue: { type: String, value: null },
             _optionsToDisplay: { type: Array, value: () => [] },
             _savedValue: { type: String },
             _showNoResultsItem: { type: Boolean, value: false },
@@ -194,7 +194,7 @@ import './vcf-autosuggest-overlay';
     _loadingChanged(v) {
         this.loading = !v
         this.loading = v //FORCE RE-RENDER
-        this._showNoResultsItem = this._optionsToDisplay.length < (this.defaultValue==null ? 0 : 1)  && !this.loading;
+        this._showNoResultsItem = this._optionsToDisplay.length < (this._hasDefaultValue() ? 1 : 0)  && !this.loading;
     }
 
     _defaultValueChanged(v) {
@@ -214,7 +214,7 @@ import './vcf-autosuggest-overlay';
 
     _outsideClickHandler() {
         if(!this.opened) return;
-        this._applyValue(this.selectedValue == null ? (this.defaultValue==null ? '' : this.defaultValue) : this.selectedValue);
+        this._applyValue(this.selectedValue == null ? (this._hasDefaultValue() ? this.defaultValue : '') : this.selectedValue);
         this.opened = false;
     }
 
@@ -274,15 +274,19 @@ import './vcf-autosuggest-overlay';
     _refreshOptionsToDisplay(options, value) {
         if(typeof value === 'undefined') value = null;
         let _res = [];
-        if(this.customizeOptionsForWhenValueIsNull && (value == null || value.length == 0 || value.trim() == this.defaultValue.trim()))
+        if(this.customizeOptionsForWhenValueIsNull && (value == null || value.length == 0 || value.trim() == (this._hasDefaultValue() ? this.defaultValue : '').trim()))
             _res = this._limitOptions(this.optionsForWhenValueIsNull);
         else _res = this._limitOptions(this._filterOptions(options, value));
         if(!_res || _res==null) _res = [];
-        if(this.defaultValue != null && this.defaultValue.length > 0) _res.unshift({label: this.defaultValue, searchStr: this.defaultValue});
+        if(this._hasDefaultValue()) _res.unshift({label: this.defaultValue, searchStr: this.defaultValue});
         for(let i=0; i<_res.length; i++) { _res[i].optId = i; }
         this._optionsToDisplay = _res;
-        this._showNoResultsItem = this._optionsToDisplay.length < (this.defaultValue==null ? 0 : 1)  && !this.loading;
+        this._showNoResultsItem = this._optionsToDisplay.length < (this._hasDefaultValue() ? 1 : 0)  && !this.loading;
     }
+
+	_hasDefaultValue() {
+		return (this.defaultValue != null && this.defaultValue.length > 0);
+	}
 
     _limitOptions(options) {
         if(!options) return [];
@@ -291,7 +295,7 @@ import './vcf-autosuggest-overlay';
     }
 
     _filterOptions(opts, v) {
-        if(v == null || v.trim().length == 0 || v.trim() == this.defaultValue.trim()) return opts;
+        if(v == null || v.trim().length == 0 || v.trim() == (this._hasDefaultValue() ? this.defaultValue : '').trim()) return opts;
         let res = opts.filter(opt => {
             switch(this.searchMatchingMode) {
                 case "CONTAINS":
@@ -304,7 +308,7 @@ import './vcf-autosuggest-overlay';
         });
         return res;
     }
-    
+
     _onKeyDown(event) {
         const key = event.key.replace(/^Arrow/, '');
 
@@ -322,14 +326,14 @@ import './vcf-autosuggest-overlay';
             case 'Enter':
                 if (this._selectedOption) {
                     this._applyValue(this._selectedOption.value);
-                } else if(this._optionsToDisplay.length == (1 + (this.defaultValue==null ? 0 : 1))) {
-                        this._applyValue(this._optionsToDisplay[(this.defaultValue==null ? 0 : 1)].value);
-                } else if( this.defaultValue != null && this._optionsToDisplay.length == 1 ) {
+                } else if(this._optionsToDisplay.length == (1 + (this._hasDefaultValue() ? 1 : 0))) {
+                        this._applyValue(this._optionsToDisplay[(this._hasDefaultValue() ? 1 : 0)].value);
+                } else if( this._hasDefaultValue() && this._optionsToDisplay.length == 1 ) {
                     this._applyValue(this._optionsToDisplay[0].value);
                 }
                 break;
             case 'Escape':
-                this._applyValue(this.selectedValue == null ? (this.defaultValue==null ? '' : this.defaultValue) : this.selectedValue);
+                this._applyValue(this.selectedValue == null ? (this._hasDefaultValue() ? this.defaultValue : '') : this.selectedValue);
                 this.$.textField.blur();
                 this.opened = false;
                 break;
@@ -348,21 +352,21 @@ import './vcf-autosuggest-overlay';
         if(event.target.value.trim().length>0 || this.customizeOptionsForWhenValueIsNull) this._refreshOptionsToDisplay(this.options, this.inputValue)
         if(this.lazy && event.target.value.trim().length>0) this.loading = true;
         if(event.target.value.trim().length > 0) this.opened = true;
-        this._showNoResultsItem = this._optionsToDisplay.length < (this.defaultValue==null ? 0 : 1)  && !this.loading;
+        this._showNoResultsItem = this._optionsToDisplay.length < (this._hasDefaultValue() ? 1 : 0)  && !this.loading;
     }
-    
+
     _openedChange(opened) {
         if (opened) {
             this._setOverlayPosition();
             this._refreshOptionsToDisplay(this.options, this.inputValue);
         }
     }
-    
+
     _selectedOptionChanged(selectedOption) {
         if (!selectedOption) {return;}
         this.$.textField.value = selectedOption.value;
     }
-    
+
     // -------- Methods --------
 
     _setOverlayPosition() {
@@ -373,23 +377,22 @@ import './vcf-autosuggest-overlay';
     }
 
     _getSuggestedStart(value, option) {
-        if (this.disableSearchHighlighting) return;
-        if (!value) return;
-        if (option.label.trim() == this.defaultValue.trim()) return;
+        if (this.disableSearchHighlighting || !option.label || !value) return;
+        if (option.label.trim() == (this._hasDefaultValue() ? this.defaultValue : '').trim()) return;
         return option.label.substr(0, this._getValueIndex(value, option));
     }
 
     _getInputtedPart(value, option) {
-        if (this.disableSearchHighlighting) return;
-        if (option.label.trim() == this.defaultValue.trim()) return;
+        if (this.disableSearchHighlighting || !option.label) return;
+        if (option.label.trim() == (this._hasDefaultValue() ? this.defaultValue : '').trim()) return;
         if (!value) return option.label;
         return option.label.substr(this._getValueIndex(value, option), value.length);
     }
 
     _getSuggestedEnd(value, option) {
         if (this.disableSearchHighlighting) return option.label;
-        if (option.label.trim() == this.defaultValue.trim()) return option.label;
-        if (!value) return;
+		if (!option.label || !value) return;
+        if (option.label && option.label.trim() == (this._hasDefaultValue() ? this.defaultValue : '').trim()) return option.label;
         return option.label.substr(this._getValueIndex(value, option) + value.length, option.searchStr.length);
     }
 
@@ -432,7 +435,7 @@ import './vcf-autosuggest-overlay';
     }
 
     _applyValue(value, keepDropdownOpened=false) {
-        if(value == null && this.defaultValue != null) value = this.defaultValue;
+        if(value == null && this._hasDefaultValue()) value = this.defaultValue;
         this.selectedValue = (value == this.defaultValue ? null : value);
         this.dispatchEvent(
             new CustomEvent('vcf-autosuggest-value-applied', {
@@ -453,7 +456,7 @@ import './vcf-autosuggest-overlay';
     }
 
     clear(keepDropdownOpened=false) {
-        if(!keepDropdownOpened) this._applyValue(this.defaultValue != null ? this.defaultValue : '', true);
+        if(!keepDropdownOpened) this._applyValue(this._hasDefaultValue() ? this.defaultValue : '', true);
         this.$.textField.focus();
         if(!keepDropdownOpened) {
             this.opened = false;
@@ -463,21 +466,21 @@ import './vcf-autosuggest-overlay';
 
     _changeTextFieldValue(newValue) {
         this.$.textField.value = newValue;
-        
+
         this.$.textField.dispatchEvent(
             new Event('input', {
                 bubbles: true,
                 cancelable: true
             })
         );
-        
+
         this.$.textField.dispatchEvent(
             new Event('value-changed', {
                 bubbles: true,
                 cancelable: true
             })
         );
-        
+
         this.$.textField.dispatchEvent(
             new Event('change', {
                 bubbles: true,
@@ -487,7 +490,7 @@ import './vcf-autosuggest-overlay';
 
         this._inputValueChanged(newValue);
     }
-    
+
     _optionsToDisplayChanged(otd, opened) {
         if(this.customItemTemplate) {
            this._renderOptionsCustomTemplateIfApplicable();

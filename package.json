@@ -73,6 +73,7 @@
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^11.2.0",
+    "@polymer/iron-demo-helpers": "^3.0.0-pre.19",
     "chokidar": "^3.5.0",
     "compression-webpack-plugin": "4.0.1",
     "construct-style-sheets-polyfill": "2.4.6",
@@ -134,5 +135,5 @@
     },
     "hash": "acd36e64b6260c504309967aeaeacd47d301ce3b7518be7123449a9a9c01180f"
   },
-  "version": "1.0.9"
+  "version": "1.0.10"
 }
