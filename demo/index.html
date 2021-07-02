@@ -1,43 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, minimum-scale=1, initial-scale=1, user-scalable=yes" />
     <title>vcf-autosuggest demo</title>
     <script src="../node_modules/@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     <script type="module" src="demo.js"></script>
     <custom-style>
-      <style is="custom-style" include="demo-pages-shared-styles">
-        .centered {
-          max-width: 1000px;
-        }
-        main {
-          opacity: 1;
-          transition: opacity 1s;
-        }
-        main.hidden {
-          opacity: 0;
-        }
-      </style>
+        <style is="custom-style" include="demo-pages-shared-styles">
+            .centered {
+                max-width: 1000px;
+            }
+
+            main {
+                opacity: 1;
+                transition: opacity 1s;
+            }
+
+            main.hidden {
+                opacity: 0;
+            }
+        </style>
     </custom-style>
     <script>
-      window.addEventListener('WebComponentsReady', () => document.querySelector('main').classList.remove('hidden'));
+        window.addEventListener('WebComponentsReady', () => document.querySelector('main').classList.remove('hidden'));
     </script>
-  </head>
-  <body>
+</head>
+
+<body>
     <main class="vertical-section-container centered hidden">
-      <h3>Basic Usage</h3>
-      <demo-snippet>
-        <template>
-			<vcf-autosuggest id="demo1" label="Choose Brand" placeholder="Start typing a brand name..."
-			options='[
-				{"label": "Ford", "searchStr": "Ford"},
-				{"label": "BMW", "searchStr": "BMW"},
-				{"label": "Fiat", "searchStr": "Fiat"}
-			]'>
-			</vcf-autosuggest>
-        </template>
-      </demo-snippet>
+        <h3>Basic Usage</h3>
+        <demo-snippet>
+            <template>
+                <vcf-autosuggest id="Basic" label="Choose Brand" placeholder="Start typing a brand name..." options='[
+                {"label": "BMW", "searchStr": "BMW"},
+                {"label": "Fiat", "searchStr": "Fiat"},
+                {"label": "Ford", "searchStr": "Ford"},
+                {"label": "Tesla", "searchStr": "Tesla"}]'>
+                </vcf-autosuggest>
+            </template>
+        </demo-snippet>
+
+        <h3>With Default</h3>
+        <demo-snippet>
+            <template>
+                <vcf-autosuggest id="Basic" label="Choose Brand" placeholder="Start typing a brand name..." default-value="Unknown" options='[
+                {"label": "BMW", "searchStr": "BMW"},
+                {"label": "Fiat", "searchStr": "Fiat"},
+                {"label": "Ford", "searchStr": "Ford"},
+                {"label": "Tesla", "searchStr": "Tesla"}]'>
+                </vcf-autosuggest>
+            </template>
+        </demo-snippet>
     </main>
-  </body>
+</body>
+
 </html>

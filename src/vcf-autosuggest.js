@@ -93,17 +93,6 @@ import './vcf-autosuggest-overlay';
                             </vaadin-item>
                         </template>
 
-                        <template is="dom-if" if="[[_showNoResultsItem]]">
-                            <style>
-                                [part='no-results']::after {
-                                    content: 'No results';
-                                }
-                            </style>
-                            <vaadin-item disabled part="option" class="no-results">
-                                <div part="no-results"></div>
-                            </vaadin-item>
-                        </template>
-
                         <template is="dom-if" if="[[!loading]]">
                             <template is="dom-repeat" items="[[_optionsToDisplay]]" as="option">
                                 <template is="dom-if" if="[[!customItemTemplate]]">
@@ -120,6 +109,17 @@ import './vcf-autosuggest-overlay';
                                     <div id="autosuggestOverlayItem{{option.optId}}" data-tag="autosuggestOverlayItem" data-oid="{{option.optId}}"></div>
                                 </template>
                             </template>
+                        </template>
+
+                        <template is="dom-if" if="[[_showNoResultsItem]]">
+                            <style>
+                                [part='no-results']::after {
+                                    content: 'No results';
+                                }
+                            </style>
+                            <vaadin-item disabled part="option" class="no-results">
+                                <div part="no-results"></div>
+                            </vaadin-item>
                         </template>
                     </vaadin-list-box>
                     <div id="dropdownEndSlot" part="dropdown-end-slot" style="display: none;"></div>
@@ -280,7 +280,8 @@ import './vcf-autosuggest-overlay';
         let _res = [];
         if(this.customizeOptionsForWhenValueIsNull && (value == null || value.length == 0 || value.trim() == (this._hasDefaultValue() ? this.defaultValue : '').trim()))
             _res = this._limitOptions(this.optionsForWhenValueIsNull);
-        else _res = this._limitOptions(this._filterOptions(options, value));
+        else
+            _res = this._limitOptions(this._filterOptions(options, value));
         if(!_res || _res==null) _res = [];
         if(this._hasDefaultValue()) _res.unshift({label: this.defaultValue, searchStr: this.defaultValue});
         for(let i=0; i<_res.length; i++) { _res[i].optId = i; }
