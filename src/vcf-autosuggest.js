@@ -194,7 +194,7 @@ import './vcf-autosuggest-overlay';
     _loadingChanged(v) {
         this.loading = !v
         this.loading = v //FORCE RE-RENDER
-        this._showNoResultsItem = this._optionsToDisplay.length < (this._hasDefaultValue() ? 1 : 0)  && !this.loading;
+        this._updateNoResultsItem();
     }
 
     _defaultValueChanged(v) {
@@ -216,6 +216,10 @@ import './vcf-autosuggest-overlay';
         if(!this.opened) return;
         this._applyValue(this.selectedValue == null ? (this._hasDefaultValue() ? this.defaultValue : '') : this.selectedValue);
         this.opened = false;
+    }
+
+    _updateNoResultsItem() {
+        this._showNoResultsItem = this._optionsToDisplay.length <= (this._hasDefaultValue() ? 1 : 0)  && !this.loading;
     }
 
    // -------- Evt. Handlers --------
@@ -281,12 +285,12 @@ import './vcf-autosuggest-overlay';
         if(this._hasDefaultValue()) _res.unshift({label: this.defaultValue, searchStr: this.defaultValue});
         for(let i=0; i<_res.length; i++) { _res[i].optId = i; }
         this._optionsToDisplay = _res;
-        this._showNoResultsItem = this._optionsToDisplay.length < (this._hasDefaultValue() ? 1 : 0)  && !this.loading;
+        this._updateNoResultsItem();
     }
 
-	_hasDefaultValue() {
-		return (this.defaultValue != null && this.defaultValue.length > 0);
-	}
+    _hasDefaultValue() {
+        return (this.defaultValue != null && this.defaultValue.length > 0);
+    }
 
     _limitOptions(options) {
         if(!options) return [];
@@ -352,7 +356,7 @@ import './vcf-autosuggest-overlay';
         if(event.target.value.trim().length>0 || this.customizeOptionsForWhenValueIsNull) this._refreshOptionsToDisplay(this.options, this.inputValue)
         if(this.lazy && event.target.value.trim().length>0) this.loading = true;
         if(event.target.value.trim().length > 0) this.opened = true;
-        this._showNoResultsItem = this._optionsToDisplay.length < (this._hasDefaultValue() ? 1 : 0)  && !this.loading;
+        this._updateNoResultsItem();
     }
 
     _openedChange(opened) {
@@ -391,7 +395,7 @@ import './vcf-autosuggest-overlay';
 
     _getSuggestedEnd(value, option) {
         if (this.disableSearchHighlighting) return option.label;
-		if (!option.label || !value) return;
+        if (!option.label || !value) return;
         if (option.label && option.label.trim() == (this._hasDefaultValue() ? this.defaultValue : '').trim()) return option.label;
         return option.label.substr(this._getValueIndex(value, option) + value.length, option.searchStr.length);
     }
