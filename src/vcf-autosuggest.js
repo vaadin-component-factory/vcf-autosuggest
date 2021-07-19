@@ -228,7 +228,7 @@ import './vcf-autosuggest-overlay';
 
     _outsideClickHandler() {
         if(!this.opened) return;
-        this._applyValue(this.selectedValue == null ? (this._hasDefaultOption() ? this._defaultOption.label : '') : this.selectedValue);
+        this._applyValue(this.selectedValue == null ? (this._hasDefaultOption() ? this._defaultOption.key : '') : this.selectedValue);
         this.opened = false;
     }
 
@@ -358,11 +358,12 @@ import './vcf-autosuggest-overlay';
                     this._applyValue(this._optionsToDisplay[0].key);
                 }
 
-                if(this.inputValue.length > 0 && this._optionsToDisplay.length==0 && !this.loading) {
+                if(this.inputValue.length > 0 && !this.loading) {
                     this.dispatchEvent(
                         new CustomEvent('vcf-autosuggest-custom-value-submit', {
                             bubbles: true,
                             detail: {
+                                numberOfAvailableOptions: this._optionsToDisplay.length,
                                 value: this.inputValue
                             }
                         })
@@ -370,7 +371,7 @@ import './vcf-autosuggest-overlay';
                 }
                 break;
             case 'Escape':
-                this._applyValue(this.selectedValue == null ? (this._hasDefaultOption() ? this._defaultOption.label : '') : this.selectedValue);
+                this._applyValue(this.selectedValue == null ? (this._hasDefaultOption() ? this._defaultOption.key : '') : this.selectedValue);
                 this.$.textField.blur();
                 this.opened = false;
                 break;
@@ -385,10 +386,14 @@ import './vcf-autosuggest-overlay';
     }
 
     _onInput(event) {
-        this.inputValue = event.target.value.trim();
+        if(event.target != null && event.target.value != null) {
+            this.inputValue = event.target.value.trim();
+        } else {
+            this.inputValue = '';
+        }
         this._refreshOptionsToDisplay(this.options, this.inputValue)
-        if(this.lazy && event.target.value.trim().length >= this.minimumInputLengthToPerformLazyQuery) this.loading = true;
-        if(event.target.value.trim().length > 0) this.opened = true;
+        if(this.lazy && this.inputValue.length >= this.minimumInputLengthToPerformLazyQuery) this.loading = true;
+        if(this.inputValue.length > 0) this.opened = true;
         this._refreshMessageItemsState();
     }
 
@@ -480,31 +485,29 @@ import './vcf-autosuggest-overlay';
             this._selectedOption = items[nextIndex];
             return this._selectedOption.value;
         } else { // or restore the saved value
-            this._applyValue(this._savedValue);
+            //this._applyValue(this._savedValue); TODO: this is not needed, is it ? If so, the key must be saved as well because applyValue must be passed the key, not the label.
             return this._savedValue;
         }
     }
 
     _applyValue(value, keepDropdownOpened=false) {
-        if(value == null && this._hasDefaultOption()) value = this._defaultOption.label;
-        this.selectedValue = (value == this._defaultOption.label ? null : value);
+        if(value == null && this._hasDefaultOption()) value = this._defaultOption.key;
+        this.selectedValue = (value == this._defaultOption.key ? null : value);
+
+        let optLbl = "";
+        let opt = this.options.find(x => x.key == value)
+        if(!opt) opt = this.optionsForWhenValueIsNull.find(x => x.key == value)
+        if(!opt) opt = this._hasDefaultOption() ? this._defaultOption : null
+        optLbl = opt!=null ? opt.label : '';
         this.dispatchEvent(
             new CustomEvent('vcf-autosuggest-value-applied', {
                 bubbles: true,
                 detail: {
+                    label: optLbl,
                     value: value
                 }
             })
         );
-
-        let optLbl = "";
-        if(value.length > 0) {
-            let opt = this.options.find(x => x.key == value)
-            if(!opt) opt = this.optionsForWhenValueIsNull.find(x => x.key == value)
-            if(!opt) opt = this._hasDefaultOption() ? this._defaultOption : null
-            optLbl = opt.label;
-        }
-
         if(!keepDropdownOpened) {
             this._changeTextFieldValue(optLbl);
             this.opened = false;
@@ -516,7 +519,7 @@ import './vcf-autosuggest-overlay';
     }
 
     clear(keepDropdownOpened=false) {
-        if(!keepDropdownOpened) this._applyValue(this._hasDefaultOption() ? this._defaultOption.label : '', true);
+        if(!keepDropdownOpened) this._applyValue(this._hasDefaultOption() ? this._defaultOption.key : '', true);
         this.$.textField.focus();
         if(!keepDropdownOpened) {
             this.opened = false;
