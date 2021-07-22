@@ -201,7 +201,9 @@ import './vcf-autosuggest-overlay';
     }
 
     attached() {
-        this._defaultOptionChanged(this.defaultOption);
+        super.attached();
+        if (this._hasDefaultOption())
+            this._defaultOptionChanged(this.defaultOption);
     }
 
     _loadingChanged(v) {
@@ -310,9 +312,9 @@ import './vcf-autosuggest-overlay';
         this._refreshMessageItemsState();
     }
 
-	_hasDefaultOption() {
-		return (this._defaultOption != null && this._defaultOption.key != null);
-	}
+    _hasDefaultOption() {
+        return (this._defaultOption != null && this._defaultOption.key != null);
+    }
 
     _limitOptions(options) {
         if(!options) return [];
@@ -447,7 +449,7 @@ import './vcf-autosuggest-overlay';
 
     _getSuggestedEnd(value, option) {
         if (this.disableSearchHighlighting) return option.label;
-		if (!option.label) return;
+        if (!option.label) return;
         if (option.label && option.label.trim().length == 0) return;
         return option.label.substr(this._getValueIndex(value, option) + value.length, option.searchStr.length);
     }
@@ -492,7 +494,7 @@ import './vcf-autosuggest-overlay';
 
     _applyValue(value, keepDropdownOpened=false) {
         if(value == null && this._hasDefaultOption()) value = this._defaultOption.key;
-        this.selectedValue = (value == this._defaultOption.key ? null : value);
+        this.selectedValue = (this._hasDefaultOption() && value == this._defaultOption.key ? null : value);
 
         let optLbl = "";
         let opt = this.options.find(x => x.key == value)
@@ -508,49 +510,47 @@ import './vcf-autosuggest-overlay';
                 }
             })
         );
+        this._changeTextFieldValue(optLbl);
         if(!keepDropdownOpened) {
-            this._changeTextFieldValue(optLbl);
             this.opened = false;
-            this.$.textField.blur();
-        } else {
-            this._changeTextFieldValue(optLbl);
-            this._inputValueChanged(optLbl);
+            this._textFieldFocus(false)
         }
     }
 
     clear(keepDropdownOpened=false) {
         if(!keepDropdownOpened) this._applyValue(this._hasDefaultOption() ? this._defaultOption.key : '', true);
-        this.$.textField.focus();
+        this._textFieldFocus();
         if(!keepDropdownOpened) {
             this.opened = false;
-            this.$.textField.blur();
+            this._textFieldFocus(false);
         }
     }
 
     _changeTextFieldValue(newValue) {
-        this.$.textField.value = newValue;
+        if(typeof this.$ !== 'undefined') {
+            this.$.textField.value = newValue;
 
-        this.$.textField.dispatchEvent(
-            new Event('input', {
-                bubbles: true,
-                cancelable: true
-            })
-        );
+            this.$.textField.dispatchEvent(
+                new Event('input', {
+                    bubbles: true,
+                    cancelable: true
+                })
+            );
 
-        this.$.textField.dispatchEvent(
-            new Event('value-changed', {
-                bubbles: true,
-                cancelable: true
-            })
-        );
+            this.$.textField.dispatchEvent(
+                new Event('value-changed', {
+                    bubbles: true,
+                    cancelable: true
+                })
+            );
 
-        this.$.textField.dispatchEvent(
-            new Event('change', {
-                bubbles: true,
-                cancelable: true
-            })
-        );
-
+            this.$.textField.dispatchEvent(
+                new Event('change', {
+                    bubbles: true,
+                    cancelable: true
+                })
+            );
+        }
         this._inputValueChanged(newValue);
     }
 
@@ -585,8 +585,14 @@ import './vcf-autosuggest-overlay';
         if(!(foundCount>=this._optionsToDisplay.length)) setTimeout(function(){
             that._renderOptionsCustomTemplateIfApplicable();
         }, 250);
+    }
 
-
+    _textFieldFocus(focus=true) {
+        if(typeof this.$ === 'undefined') return;
+        if (focus)
+            this.$.textField.focus();
+        else
+            this.$.textField.blur();
     }
 }
 
