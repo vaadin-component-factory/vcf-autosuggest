@@ -20,7 +20,11 @@
        bottom: auto;
        background: #fff;
      }
- 
+
+     [part='content'] {
+        padding: 0;
+     }
+
      [part='overlay'] {
        background-color: var(--lumo-base-color);
        background-image: linear-gradient(var(--lumo-tint-5pct), var(--lumo-tint-5pct));

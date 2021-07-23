@@ -46,6 +46,10 @@ import './vcf-autosuggest-overlay';
     static get template() {
         return html`
             <style>
+                .container {
+                    padding: 2px;
+                }
+
                 :host {
                     display: inline-block;
                 }
@@ -61,7 +65,7 @@ import './vcf-autosuggest-overlay';
             <div class="container">
                 <vaadin-text-field id="textField" on-focus="_textFieldFocused" label="[[label]]" placeholder="[[placeholder]]" theme$="[[theme]]"> </vaadin-text-field>
                 <vcf-autosuggest-overlay id="autosuggestOverlay" opened="{{opened}}" theme$="[[theme]]">
-                    <vaadin-list-box id="optionsContainer" part="options-container">
+                    <vaadin-list-box id="optionsContainer" part="options-container" style="margin: 0;">
                         <template is="dom-if" if="[[loading]]" restamp="true">
                             <style>
                                 [part='loading-indicator'] {
@@ -82,8 +86,8 @@ import './vcf-autosuggest-overlay';
                                 }
 
                                 [part='option'].loading {
-                                    padding-left: 0em;
-                                    padding-right: 0em;
+                                    padding-left: 0.5em;
+                                    padding-right: 0.5em;
                                 }
                             </style>
 
@@ -94,6 +98,11 @@ import './vcf-autosuggest-overlay';
 
                         <template is="dom-if" if="[[_showNoResultsItem]]">
                             <style>
+                                [part='option'] {
+                                    padding-left: 0.5em;
+                                    padding-right: 0.5em;
+                                }
+
                                 [part='no-results']::after {
                                     content: var(--x-no-results-msg);
                                 }
@@ -105,6 +114,11 @@ import './vcf-autosuggest-overlay';
 
                         <template is="dom-if" if="[[_showInputLengthBelowMinimumItem]]">
                             <style>
+                                [part='option'] {
+                                    padding-left: 0.5em;
+                                    padding-right: 0.5em;
+                                }
+
                                 [part='input-length-below-minimum']::after {
                                     content: var(--x-input-length-below-minimum-msg);
                                 }
@@ -118,6 +132,11 @@ import './vcf-autosuggest-overlay';
                             <template is="dom-repeat" items="[[_optionsToDisplay]]" as="option">
                                 <template is="dom-if" if="[[!customItemTemplate]]">
                                     <style>
+                                        [part='option'] {
+                                            padding-left: 0.5em;
+                                            padding-right: 0.5em;
+                                        }
+
                                         [part='bold'] {
                                             font-weight: 600;
                                         }
@@ -127,12 +146,18 @@ import './vcf-autosuggest-overlay';
                                     </vaadin-item>
                                 </template>
                                 <template is="dom-if" if="[[customItemTemplate]]">
-                                    <div id="autosuggestOverlayItem{{option.optId}}" data-tag="autosuggestOverlayItem" data-oid="{{option.optId}}" data-key="{{option.key}}"></div>
+                                    <style>
+                                        [part='option'] {
+                                            padding-left: 0.5em;
+                                            padding-right: 0.5em;
+                                        }
+                                    </style>
+                                    <div id="autosuggestOverlayItem{{option.optId}}" part="option" data-tag="autosuggestOverlayItem" data-oid="{{option.optId}}" data-key="{{option.key}}"></div>
                                 </template>
                             </template>
                         </template>
                     </vaadin-list-box>
-                    <div id="dropdownEndSlot" part="dropdown-end-slot" style="display: none;"></div>
+                    <div id="dropdownEndSlot" part="dropdown-end-slot" style="display: none; padding-left: 0.5em; padding-right: 0.5em;"></div>
                 </vcf-autosuggest-overlay>
         `;
     }
@@ -372,6 +397,8 @@ import './vcf-autosuggest-overlay';
                     );
                 }
                 break;
+            case 'Tab':
+            case 'Esc':
             case 'Escape':
                 this._applyValue(this.selectedValue == null ? (this._hasDefaultOption() ? this._defaultOption.key : '') : this.selectedValue);
                 this.$.textField.blur();
