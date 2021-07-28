@@ -273,7 +273,7 @@ import './vcf-autosuggest-overlay';
         this.addEventListener('click', this._elementClickListener);
         this.addEventListener('blur', this._elementBlurListener);
         this.addEventListener('keydown', this._onKeyDown.bind(this));
-		this.addEventListener('wheel', this._elementWheelListener);
+        this.addEventListener('wheel', this._elementWheelListener);
         this._overlayElement = this.$.autosuggestOverlay;
         this._optionsContainer = this.$.optionsContainer;
         this._overlayElement.addEventListener('vaadin-overlay-outside-click', ev => ev.preventDefault());
@@ -287,10 +287,10 @@ import './vcf-autosuggest-overlay';
         document.removeEventListener('click', this._boundOutsideClickHandler);
     }
 
-	_elementWheelListener(event) {
+    _elementWheelListener(event) {
         if (this.opened) {
-			let that = this;
-			setTimeout(function() { that._setOverlayPosition(); }, 0);
+            let that = this;
+            setTimeout(function() { that._setOverlayPosition(); }, 0);
         }
     }
 
