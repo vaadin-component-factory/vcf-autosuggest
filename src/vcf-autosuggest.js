@@ -429,6 +429,9 @@ import './vcf-autosuggest-overlay';
         if (opened) {
             this._setOverlayPosition();
             this._refreshOptionsToDisplay(this.options, this.inputValue);
+            window.addEventListener('scroll', this._boundSetOverlayPosition, true);
+        } else {
+            window.removeEventListener('scroll', this._boundSetOverlayPosition, true);
         }
     }
 
