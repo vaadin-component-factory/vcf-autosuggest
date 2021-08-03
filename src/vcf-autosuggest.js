@@ -374,7 +374,6 @@ import './vcf-autosuggest-overlay';
 
     _onKeyDown(event) {
         const key = event.key.replace(/^Arrow/, '');
-
         switch (key) {
             case 'Down':
                 event.preventDefault();
@@ -407,6 +406,7 @@ import './vcf-autosuggest-overlay';
                     );
                 }
                 break;
+            case 'Tab':
             case 'Esc':
             case 'Escape':
                 this._applyValue(this.selectedValue == null ? (this._hasDefaultOption() ? this._defaultOption.key : '') : this.selectedValue);
@@ -439,6 +439,9 @@ import './vcf-autosuggest-overlay';
         if (opened) {
             this._setOverlayPosition();
             this._refreshOptionsToDisplay(this.options, this.inputValue);
+            window.addEventListener('scroll', this._boundSetOverlayPosition, true);
+        } else {
+            window.removeEventListener('scroll', this._boundSetOverlayPosition, true);
         }
     }
 
