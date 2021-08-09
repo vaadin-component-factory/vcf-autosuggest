@@ -440,8 +440,10 @@ import './vcf-autosuggest-overlay';
             this._setOverlayPosition();
             this._refreshOptionsToDisplay(this.options, this.inputValue);
             window.addEventListener('scroll', this._boundSetOverlayPosition, true);
+            this.$.textField.addEventListener('wheel', this._cancelEvent, true);
         } else {
             window.removeEventListener('scroll', this._boundSetOverlayPosition, true);
+            this.$.textField.removeEventListener('wheel', this._cancelEvent, true);
         }
     }
 
@@ -451,6 +453,11 @@ import './vcf-autosuggest-overlay';
     }
 
     // -------- Methods --------
+
+    _cancelEvent(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+    }
 
     _setOverlayPosition() {
         const inputRect = this.$.textField.getBoundingClientRect();
