@@ -23,7 +23,6 @@ import {} from '@polymer/polymer/lib/utils/flush.js';
 import '@vaadin/vaadin-text-field';
 import '@vaadin/vaadin-list-box';
 import '@vaadin/vaadin-item';
-import '@vaadin/vaadin-button';
 import '@vaadin/vaadin-lumo-styles/icons';
 import '@polymer/iron-icon';
 import './vcf-autosuggest-overlay';
@@ -52,14 +51,6 @@ import './vcf-autosuggest-overlay';
 
                 :host {
                     display: inline-block;
-                }
-
-                :host([opened]) {
-                    pointer-events: auto;
-                }
-
-                :host([read-only]) {
-                    pointer-events: none;
                 }
             </style>
             <div class="container">
@@ -248,9 +239,7 @@ import './vcf-autosuggest-overlay';
     }
 
     _textFieldFocused() {
-        if (this.inputValue && this.inputValue.length > 0) {
-            this.opened = true;
-        }
+        if (this.inputValue && this.inputValue.length > 0) this._openOverlay();
     }
 
     _outsideClickHandler() {
@@ -287,7 +276,7 @@ import './vcf-autosuggest-overlay';
     }
 
     _elementClickListener(event) {
-        if(this.openDropdownOnClick) this.opened = true;
+        if(this.openDropdownOnClick) this._openOverlay();
         event.stopPropagation();
     }
 
@@ -296,7 +285,7 @@ import './vcf-autosuggest-overlay';
             this._selectedOption._setFocused(false);
             this._selectedOption = null;
         }
-        if (value.length > 0 && !this.opened) this.opened = true;
+        if (value.length > 0) this._openOverlay();
         else if (value.length == 0 && this.opened && !this.openDropdownOnClick) this.opened = false;
         this.dispatchEvent(
             new CustomEvent('vcf-autosuggest-input-value-changed', {
@@ -368,12 +357,12 @@ import './vcf-autosuggest-overlay';
         switch (key) {
             case 'Down':
                 event.preventDefault();
-                this.opened = true;
+                this._openOverlay();
                 this._navigate('next');
                 break;
             case 'Up':
                 event.preventDefault();
-                this.opened = true;
+                this._openOverlay();
                 this._navigate('prev');
                 break;
             case 'Enter':
@@ -422,8 +411,12 @@ import './vcf-autosuggest-overlay';
         }
         this._refreshOptionsToDisplay(this.options, this.inputValue)
         if(this.lazy && this.inputValue.length >= this.minimumInputLengthToPerformLazyQuery) this.loading = true;
-        if(this.inputValue.length > 0) this.opened = true;
+        if(this.inputValue.length > 0) this._openOverlay();
         this._refreshMessageItemsState();
+    }
+
+    _openOverlay() {
+        if (!this.readOnly && !this.opened) {this.opened = true;}
     }
 
     _openedChange(opened) {
