@@ -1,3 +1,4 @@
+import '@polymer/polymer/lib/elements/dom-module.js';
 import '@vaadin/vaadin-lumo-styles/style';
 
 const theme = document.createElement('dom-module');
